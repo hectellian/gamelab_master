@@ -18,6 +18,9 @@ class GamelabMasterBot:
         
         with open('announcements.json', 'r') as file:
             self.announcements = json.load(file)['announcements']
+        
+        with open('closed.json', 'r') as file:
+            self.closed = json.load(file)['announcements']
 
         # Set up the bot with Application (replaces Updater)
         self.application = Application.builder().token(token).build()
@@ -77,7 +80,7 @@ class GamelabMasterBot:
                 count_yes = poll_info.options[0].voter_count
                 if count_yes < 2:
                     await self.application.bot.send_message(chat_id=self.official_chat_id,
-                                                            text="The Gamelab will not take place tomorrow due to insufficient confirmed attendance.")
+                                                            text=random.choice(self.closed))
         except Exception as e:
             self.logger.error(f"Failed to conclude poll: {e}")
             await self.application.bot.send_message(chat_id=self.official_chat_id,
