@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "gamelab-master"
+version = "0.1.0"
+description = "Telegram Bot to manage presence and annoucements for the Gamelab"
+authors = ["Anthony Christoforou <christoforouanthony@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+python-telegram-bot = "^21.1.1"
+APScheduler = "^3.10.4"
+python-dotenv = "^1.0.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
