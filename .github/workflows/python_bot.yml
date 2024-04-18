@@ -10,7 +10,7 @@ jobs:
     environment: dev
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Python 3.10
+      - name: Set up Python 3.11
         uses: actions/setup-python@v2
         with:
           python-version: 3.11.0
@@ -26,10 +26,10 @@ jobs:
     environment: ${{ github.ref == 'refs/heads/dev' && 'dev' || 'prod' }}
     steps:
       - uses: actions/checkout@v2
-      - name: Set up Python 3.10
+      - name: Set up Python 3.11
         uses: actions/setup-python@v2
         with:
-          python-version: 3.10
+          python-version: 3.11.0
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
         with:
