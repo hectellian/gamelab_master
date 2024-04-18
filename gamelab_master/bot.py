@@ -2,6 +2,7 @@
 import json
 import random
 import logging
+from pytz import timezone
 from telegram import Update
 from telegram.ext import Application, CommandHandler, CallbackContext, PollAnswerHandler
 from apscheduler.schedulers.asyncio  import AsyncIOScheduler
@@ -36,7 +37,8 @@ class GamelabMasterBot:
         self.application.add_error_handler(self.error_callback)
 
         # Initialize and start the scheduler
-        self.scheduler = AsyncIOScheduler()
+        paris_tz = timezone('Europe/Paris')
+        self.scheduler = AsyncIOScheduler(timezone=paris_tz)
         self.scheduler.add_job(self.send_poll, trigger='cron', day_of_week='tue', hour=18, minute=0)
         self.scheduler.add_job(self.check_poll_results, trigger='cron', day_of_week='tue', hour=23, minute=59)
 
