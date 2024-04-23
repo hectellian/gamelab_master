@@ -15,7 +15,9 @@ class GamelabMasterBot:
         self.token = token
         self.comitee_chat_id = comitee_chat_id
         self.official_chat_id = official_chat_id
+        self.announcement_sent = False
         self.poll_message_id = None
+        self.votes = [0, 0]
         
         with open('announcements.json', 'r') as file:
             self.announcements = json.load(file)['announcements']
@@ -33,6 +35,7 @@ class GamelabMasterBot:
 
         # Set up handlers
         self.application.add_handler(CommandHandler("start", self.start))
+        self.application.add_handler(CommandHandler("poll", self.poll))
         self.application.add_handler(PollAnswerHandler(self.handle_poll_answer))
         self.application.add_error_handler(self.error_callback)
 
@@ -55,24 +58,32 @@ class GamelabMasterBot:
                                            is_anonymous=False, allows_multiple_answers=False)
             self.logger.info("Poll sent")
             self.poll_message_id = msg.message_id
+            self.announcement_sent = False
+            self.votes = [0, 0]
         except Exception as e:
             self.logger.error("Failed to send poll: {}".format(e))
             raise PollError("Failed to send poll") from e
+        
+    async def poll(self, update: Update, context: CallbackContext) -> None:
+        """Call the poll function."""
+        await self.send_poll()
 
     async def handle_poll_answer(self, update: Update, context: CallbackContext) -> None:
         """Handle the poll answer and send a message to the official chat if enough people will attend."""
-        options_counts = [0, 0]
         for answer in update.poll_answer.option_ids:
-            options_counts[answer] += 1
+            self.votes[answer] += 1
             
-        if options_counts[0] >= 2:
-            try:
+        try:
+            if self.votes[0] >= 2 and not self.announcement_sent:
                 await self.application.bot.send_message(chat_id=self.official_chat_id,
-                                                  text=random.choice(self.announcements))
+                                            text=random.choice(self.announcements))
                 self.logger.info("Announcement sent")
-            except Exception as e:
-                self.logger.error("Failed to send announcement: {}".format(e))
-                raise CommunicationError("Failed to send announcement") from e
+                self.announcement_sent = True
+        except Exception as e:
+            self.logger.error("Failed to handle poll answer: {}".format(e))
+            raise CommunicationError("Failed to handle poll answer") from e
+
+
             
     async def check_poll_results(self):
         """Check if the required number of affirmative responses has been reached by midnight."""
@@ -91,7 +102,7 @@ class GamelabMasterBot:
     async def error_callback(self, update: Update, context: CallbackContext) -> None:
         """Log errors and send a message to the user about the encountered error."""
         self.logger.error('Update "{}" caused error "{}"'.format(update, context.error))
-        await context.bot.send_message(chat_id=update.effective_chat.id,
+        await self.application.bot.send_message(chat_id=update.effective_chat.id,
                                  text='An error occurred: {}'.format(context.error))
 
     def run(self):
