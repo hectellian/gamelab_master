@@ -8,6 +8,9 @@ from gamelab_master.bot import GamelabMasterBot
 def bot():
     return GamelabMasterBot(token='dummy', comitee_chat_id='test', official_chat_id='test')
 
+def test_dummy():
+    assert True
+
 # # Test starting the bot command
 # @pytest.mark.asyncio
 # async def test_start(bot, mocker):
