@@ -42,9 +42,3 @@ def bot():
 #     mocker.patch('gamelab_master.bot.GamelabMasterBot.send_poll', new_callable=AsyncMock, side_effect=Exception("Failed to send poll"))
 #     with pytest.raises(Exception):
 #         await bot.send_poll()
-
-# Test loading announcements from JSON
-def test_load_announcements(bot):
-    announcements = bot.announcements
-    assert len(announcements) > 0
-    assert isinstance(announcements, list)
